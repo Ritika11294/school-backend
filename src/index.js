@@ -22,7 +22,7 @@ app.use("/teachers", teacherController)
 app.use('/classes', classController)
 // app.use('/admin', adminController)
 
-app.listen(2455, async function () {
+app.listen(port, async function () {
     try {
         await connect()
         console.log(`listening on port ${port}`)
