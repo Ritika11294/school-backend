@@ -4,7 +4,7 @@ const authenticate = require('../middleware/authenticate')
 const Teacher = require("../models/teacher.model")
 
 
-router.post('/', authenticate, async (req, res) => {
+router.post('', authenticate, async (req, res) => {
     const ADMINID = req.admin._id
     try {
         const teachers = await Teacher.create({
@@ -20,7 +20,7 @@ router.post('/', authenticate, async (req, res) => {
     }
 })
 
-router.get('/', async (req, res) => {
+router.get('', async (req, res) => {
     try {
         const page = req.query.page || 1;
         const size = req.query.size || 4;
