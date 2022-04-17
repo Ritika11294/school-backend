@@ -22,10 +22,36 @@ router.post('/', authenticate, async (req, res) => {
 
 router.get('/', async (req, res) => {
     try {
-        const teachers = await Teacher.find().populate({ path: "class_id", select: ["section", "grades", "subject"] }).lean().exec()
-        res.status(500).send(teachers)
-    } catch (error) {
-        res.status(500).send(error.message)
+        const page = req.query.page || 1;
+        const size = req.query.size || 4;
+        const operation = req.query.task;
+
+
+        if (operation == "female" || operation == "Female") {
+            const teacher = await Teacher.find({ $or: [{ gender: "female" }, { gender: "Female" }] }).skip((page - 1) * size).limit(size).lean().exec();
+            const totalpages = Math.ceil((await Teacher.find({ $or: [{ gender: "female" }, { gender: "Female" }] }).countDocuments()) / size)
+            return res.status(201).send({ teacher, totalpages, operation });
+        }
+        else if (operation == "male" || operation == "Male") {
+            const teacher = await Teacher.find({ $or: [{ gender: "male" }, { gender: "Male" }] }).skip((page - 1) * size).limit(size).lean().exec();
+            const totalpages = Math.ceil((await Teacher.find({ $or: [{ gender: "male" }, { gender: "Male" }] }).countDocuments()) / size)
+            return res.status(201).send({ teacher, totalpages });
+        }
+        else if (operation == "asc") {
+            const teacher = await Teacher.find().sort({ age: 1 }).skip((page - 1) * size).limit(size).lean().exec();
+            const totalpages = Math.ceil((await Teacher.find().sort({ age: 1 }).countDocuments()) / size)
+            return res.status(201).send({ teacher, totalpages });
+        }
+        else if (operation == "dsc") {
+            const teacher = await Teacher.find().sort({ age: -1 }).skip((page - 1) * size).limit(size).lean().exec();
+            const totalpages = Math.ceil((await Teacher.find().sort({ age: -1 }).countDocuments()) / size)
+            return res.status(201).send({ teacher, totalpages });
+        }
+        const teacher = await Teacher.find().skip((page - 1) * size).limit(size).lean().exec();
+        const totalpages = Math.ceil((await Teacher.find().countDocuments()) / size)
+        return res.status(201).send(teacher);
+    } catch (err) {
+        return res.status(500).send(err.message);
     }
 })
 
